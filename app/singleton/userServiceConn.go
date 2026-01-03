@@ -3,7 +3,7 @@ package singleton
 import (
 	"sync"
 
-	"github.com/ducthangng/geofleet/gateway/app/usecase/user_service/pb"
+	pb "github.com/ducthangng/geofleet-proto/user"
 	_ "github.com/mbobakov/grpc-consul-resolver" // IMPORTANT: REGISTER consul resolver with grpc
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

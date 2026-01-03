@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	pb "github.com/ducthangng/geofleet-proto/user"
 	"github.com/ducthangng/geofleet/gateway/app/singleton"
-	"github.com/ducthangng/geofleet/gateway/app/usecase/user_service/pb"
 
 	"google.golang.org/grpc"
 )
