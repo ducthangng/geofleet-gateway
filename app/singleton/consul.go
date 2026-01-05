@@ -2,6 +2,7 @@ package singleton
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/hashicorp/consul/api"
@@ -13,7 +14,6 @@ var (
 )
 
 func GetConsulClient() (*api.Client, error) {
-
 	var err error
 	config := GetGlobalConfig()
 
@@ -24,17 +24,20 @@ func GetConsulClient() (*api.Client, error) {
 		client, clientErr := api.NewClient(consulConfig)
 		if clientErr != nil {
 			err = fmt.Errorf("could not create consul client: %v", clientErr)
+			log.Println(err)
 			return
 		}
 
 		// 3. Verify connection with a simple Agent check
 		_, agentErr := client.Agent().Self()
 		if agentErr != nil {
-			err = fmt.Errorf("consul agent unreachable at %s: %v", config.ConsulAddress, agentErr)
+			err = fmt.Errorf("consul agent unreachable at %s: %v", consulConfig.Address, agentErr)
+			log.Println(err)
 			return
 		}
 
 		consulClient = client
+		log.Println("connect successfully to consul at: ", consulConfig.Address)
 	})
 
 	return consulClient, err

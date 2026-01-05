@@ -13,6 +13,7 @@ type GatewayGlobalConfig struct {
 	Port           string `mapstructure:"PORT"`
 	RequestTimeout int    `mapstructure:"REQUEST_TIMEOUT"`
 	RateLimit      int    `mapstructure:"RATE_LIMIT"`
+	Env            string `mapstructure:"ENV"`
 
 	// Redis
 	RedisHost string `mapstructure:"REDIS_HOST"`

@@ -37,6 +37,19 @@ services:
     networks:
       - gateway-network
 
+  db:
+      image: kartoza/postgis:18-3.6--v2025.11.24 # Adjust versions as needed (Postgres 15, PostGIS 3.3)
+      container_name: postgis_db
+      restart: always
+      environment:
+        - POSTGRES_USER=root
+        - POSTGRES_PASS=secret
+        - POSTGRES_DBNAME=geofleet
+      ports:
+        - "5432:5432"
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+  
   # gateway:
   #   build: .
   #   container_name: gateway-service
@@ -47,6 +60,9 @@ services:
   #     - REDIS_HOST=redis-server
   #   networks:
   #     - gateway-network
+
+volumes:
+  postgres_data:
 
 networks:
   gateway-network:

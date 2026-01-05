@@ -14,4 +14,8 @@ gen-proto:
 clean-proto:
 	rm pb/*.go
 
-.PHONY: consul
+update-proto:
+	GOPROXY=direct go get github.com/ducthangng/geofleet-proto@latest
+	go mod tidy
+
+.PHONY: consul update-proto

@@ -30,11 +30,10 @@ type UserCreation struct {
 
 func (u *UserService) CreateUserProfile(ctx context.Context, data UserCreation) (userId int, err error) {
 
-	log.Println("got this: ")
-	return
-
+	log.Println("enter CreateUserProfile")
 	conn, err := singleton.GetUserServiceClient()
 	if err != nil {
+		log.Println("error 1: ", err)
 		return
 	}
 
@@ -46,6 +45,10 @@ func (u *UserService) CreateUserProfile(ctx context.Context, data UserCreation) 
 		Address:  data.Address,
 		Bod:      data.Bod,
 	})
+	if err != nil {
+		log.Println("error 2: ", err)
+		return userId, err
+	}
 
 	log.Println("got this: ", grpcRes)
 
