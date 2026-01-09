@@ -3,14 +3,13 @@ package usecase
 import (
 	"context"
 
-	pb "github.com/ducthangng/geofleet-proto/user"
 	"github.com/ducthangng/geofleet/gateway/app/usecase/user_service"
 	"google.golang.org/grpc"
 )
 
-type UserServiceUsecase interface {
-	CreateUserProfile(ctx context.Context, data user_service.UserCreation) (userId int, err error)
-	GetUserProfile(ctx context.Context, userId int) (res user_service.UserDTO, err error)
-	TrackMultipleRides(*pb.TrackRidesRequest, grpc.ServerStreamingServer[pb.RideLocation]) error
-	UploadLocationHistory(grpc.ClientStreamingServer[pb.LocationData, pb.UploadStatus]) error
+type IdentityServiceUsecase interface {
+	CheckDuplicatedPhone(ctx context.Context, dto user_service.CheckDuplicatePhoneRequest) (user_service.CheckDuplicatePhoneResponse, error)
+	CreateUserProfile(ctx context.Context, data user_service.UserCreation) (userId string, err error)
+	Login(ctx context.Context, in user_service.LoginRequest, opts ...grpc.CallOption) (user_service.LoginResponse, error)
+	GetUserProfile(ctx context.Context, userId string) (res user_service.User, err error)
 }

@@ -3,20 +3,20 @@ package singleton
 import (
 	"sync"
 
-	pb "github.com/ducthangng/geofleet-proto/user"
+	identity_v1 "github.com/ducthangng/geofleet-proto/gen/go/identity/v1"
 	_ "github.com/mbobakov/grpc-consul-resolver" // IMPORTANT: REGISTER consul resolver with grpc
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
-	userClient pb.UserServiceClient
+	userClient identity_v1.UserServiceClient
 	userConn   *grpc.ClientConn
 	userOnce   sync.Once
 )
 
 // GetUserServiceClient trả về singleton client để gọi sang User Service
-func GetUserServiceClient() (pb.UserServiceClient, error) {
+func GetUserServiceClient() (identity_v1.UserServiceClient, error) {
 	var err error
 
 	userOnce.Do(func() {
@@ -33,7 +33,7 @@ func GetUserServiceClient() (pb.UserServiceClient, error) {
 			grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
 		)
 		if err == nil {
-			userClient = pb.NewUserServiceClient(userConn)
+			userClient = identity_v1.NewUserServiceClient(userConn)
 		}
 	})
 

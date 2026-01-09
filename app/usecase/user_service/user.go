@@ -2,101 +2,81 @@ package user_service
 
 import (
 	"context"
-	"fmt"
-	"log"
 
-	pb "github.com/ducthangng/geofleet-proto/user"
+	common_v1 "github.com/ducthangng/geofleet-proto/gen/go/common/v1"
+	identity_v1 "github.com/ducthangng/geofleet-proto/gen/go/identity/v1"
+
 	"github.com/ducthangng/geofleet/gateway/app/singleton"
 
 	"google.golang.org/grpc"
 )
 
-type UserService struct {
-	pb.UnimplementedUserServiceServer
+type IdentityService struct {
+	identity_v1.UnimplementedUserServiceServer
 }
 
-func NewUserService() *UserService {
-	return &UserService{}
+func NewUserService() *IdentityService {
+	return &IdentityService{}
 }
 
-type UserCreation struct {
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Fullname string `json:"fullname"`
-	Password string `json:"password"`
-	Address  string `json:"address"`
-	Bod      string `json:"bod"`
-}
-
-func (u *UserService) CreateUserProfile(ctx context.Context, data UserCreation) (userId int, err error) {
-
-	log.Println("enter CreateUserProfile")
+/*
+Task: passing the request to the other service
+*/
+func (u *IdentityService) CreateUserProfile(ctx context.Context, data UserCreation) (userId string, err error) {
 	conn, err := singleton.GetUserServiceClient()
 	if err != nil {
-		log.Println("error 1: ", err)
 		return
 	}
 
-	grpcRes, err := conn.CreateUserProfile(ctx, &pb.UserCreationRequest{
+	grpcRes, err := conn.CreateUserProfile(ctx, &identity_v1.CreateUserProfileRequest{
 		Fullname: data.Fullname,
 		Email:    data.Email,
 		Phone:    data.Phone,
-		Password: data.Password,
-		Address:  data.Address,
-		Bod:      data.Bod,
+		Password: &common_v1.Password{
+			Value: data.Password,
+		},
+		Address: data.Address,
+		// TODO: convert string - timestamp to timestamppb
+		// Bod:      data.Bod,
 	})
+
 	if err != nil {
-		log.Println("error 2: ", err)
 		return userId, err
 	}
 
-	log.Println("got this: ", grpcRes)
-
-	return
-}
-
-type UserDTO struct {
-	UserId   int     `json:"userId"`
-	Fullname string  `json:"fullname"`
-	Address  string  `json:"address"`
-	Bod      string  `json:"bod"`
-	Score    float64 `json:"score"`
+	return grpcRes.UserId, nil
 }
 
 // this is a unary call, call once and get the result immediately
-func (u *UserService) GetUserProfile(ctx context.Context, userId int) (res UserDTO, err error) {
+func (u *IdentityService) GetUserProfile(ctx context.Context, userId string) (res User, err error) {
 	conn, err := singleton.GetUserServiceClient()
 	if err != nil {
 		return res, err
 	}
 
-	grpcResult, err := conn.GetUserProfile(ctx, &pb.UserInfoRequest{
-		UserId: fmt.Sprintf("%d", userId),
+	grpcResult, err := conn.GetUserProfile(ctx, &identity_v1.GetUserProfileRequest{
+		UserId: userId,
 	})
 	if err != nil {
 		return res, err
 	}
 
-	res = UserDTO{
+	res = User{
 		UserId:   userId,
 		Fullname: grpcResult.Fullname,
 		Address:  grpcResult.Address,
-		Bod:      grpcResult.Bod,
-		Score:    grpcResult.Score,
+		// TODO: what is the good practice here?
+		// Bod:   *grpcResult.Bod,
+		Score: grpcResult.Score,
 	}
 
 	return res, nil
 }
 
-func (u *UserService) Login(ctx context.Context, data UserDTO) (user UserDTO, err error) {
-	return
+func (u *IdentityService) Login(context.Context, LoginRequest, ...grpc.CallOption) (LoginResponse, error) {
+	return LoginResponse{}, nil
 }
 
-func (u *UserService) TrackMultipleRides(*pb.TrackRidesRequest, grpc.ServerStreamingServer[pb.RideLocation]) error {
-
-	return nil
-}
-
-func (u *UserService) UploadLocationHistory(grpc.ClientStreamingServer[pb.LocationData, pb.UploadStatus]) error {
-	return nil
+func (u *IdentityService) CheckDuplicatedPhone(ctx context.Context, data CheckDuplicatePhoneRequest) (CheckDuplicatePhoneResponse, error) {
+	return CheckDuplicatePhoneResponse{}, nil
 }
