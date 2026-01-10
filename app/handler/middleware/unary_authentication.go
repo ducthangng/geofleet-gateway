@@ -23,6 +23,7 @@ var publicMethods = map[string]bool{
 	"/geofleet.identity.v1.UserService/Login":                        true,
 	"/geofleet.identity.v1.UserService/CheckDuplicatedPhone":         true,
 	"/geofleet.identity.v1.UserService/CreateUserProfile":            true,
+	"/geofleet.tracking.v1.TrackingService/UploadLocationHistory":    true,
 	"/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo": true,
 }
 

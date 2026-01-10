@@ -1,6 +1,7 @@
 package singleton
 
 import (
+	"log"
 	"sync"
 	"time"
 
@@ -13,16 +14,21 @@ var (
 )
 
 // GetKafkaWriter returns a singleton instance of the Kafka Producer
-func GetKafkaWriter(brokers []string, topic string) *kafka.Writer {
+func GetKafkaWriter() *kafka.Writer {
 	kafkaOnce.Do(func() {
+		centralConfig := GetGlobalConfig()
+		brokers := centralConfig.KafkaBrokers
+
 		kafkaWriter = &kafka.Writer{
 			Addr:         kafka.TCP(brokers...),
-			Topic:        topic,
 			Balancer:     &kafka.LeastBytes{}, // Efficiently distributes messages
 			BatchTimeout: 10 * time.Millisecond,
 			Async:        true, // Non-blocking for Gateway performance
+			Logger:       kafka.LoggerFunc(log.Printf),
+			ErrorLogger:  kafka.LoggerFunc(log.Printf),
 		}
 	})
+
 	return kafkaWriter
 }
 

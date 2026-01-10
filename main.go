@@ -27,7 +27,7 @@ func main() {
 
 	singleton.GetRedisClient()
 	singleton.GetConsulClient()
-	singleton.GetKafkaWriter(centralConfig.KafkaBrokers, centralConfig.KafkaTopic)
+	singleton.GetKafkaWriter()
 
 	// 1. Mở port TCP
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", centralConfig.Host, centralConfig.Port))

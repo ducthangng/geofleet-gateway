@@ -49,7 +49,7 @@ func (idh *IdentityHandler) CreateUserProfile(ctx context.Context, input *identi
 		Address:  input.Address,
 		Email:    input.Email,
 		Bod:      input.Bod.AsTime().GoString(),
-		Role:     int(input.Role),
+		Role:     input.Role.Descriptor().Index(),
 	}
 
 	log.Println("got userCreation: ", userCreation)
@@ -77,7 +77,6 @@ func (idh *IdentityHandler) Login(ctx context.Context, input *identity_v1.LoginR
 	)
 
 	if err = protovalidate.Validate(input); err != nil {
-		panic(err)
 		return nil, err
 	}
 
@@ -89,7 +88,6 @@ func (idh *IdentityHandler) Login(ctx context.Context, input *identity_v1.LoginR
 
 	res = &identity_v1.LoginResponse{
 		UserId: loginResponse.User.UserId,
-		// Fullname: loginResponse.User.Fullname,
 	}
 
 	return res, nil
