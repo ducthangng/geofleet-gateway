@@ -1,13 +1,12 @@
 package middleware
 
 import (
+	"context"
 	"log"
 	"net/http"
-
-	"context"
 	"strings"
 
-	"github.com/ducthangng/geofleet/gateway/service/gjwt"
+	"github.com/ducthangng/geofleet/gateway/service/gwjwt"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -76,7 +75,7 @@ func authorize(ctx context.Context) (userId string, err error) {
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 	// 4. Validate JWT
-	claims, err := gjwt.VerifyToken(tokenString)
+	claims, err := gwjwt.VerifyToken(tokenString)
 	if err != nil {
 		return userId, status.Errorf(codes.Unauthenticated, "invalid token: %v", err)
 	}
@@ -98,7 +97,7 @@ func AuthenticationMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		decodedSigningKey, err := gjwt.VerifyToken(cookie)
+		decodedSigningKey, err := gwjwt.VerifyToken(cookie)
 		if err != nil {
 			log.Println("failed")
 			return
@@ -113,6 +112,5 @@ func AuthenticationMiddleware() gin.HandlerFunc {
 		ctx.Set("ID", decodedSigningKey.Data.UserId)
 		ctx.Set("EntityCode", decodedSigningKey.Data.Role)
 		ctx.Set("Phone", decodedSigningKey.Data.Phone)
-		ctx.Set("SessionID", decodedSigningKey.Data.SessionId)
 	}
 }

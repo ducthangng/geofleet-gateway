@@ -49,10 +49,9 @@ func (idh *IdentityHandler) CreateUserProfile(ctx context.Context, input *identi
 		Address:  input.Address,
 		Email:    input.Email,
 		Bod:      input.Bod.AsTime().GoString(),
-		Role:     input.Role.Descriptor().Index(),
+		Role:     input.Role,
 	}
 
-	log.Println("got userCreation: ", userCreation)
 	userId, err = idh.UserUsecase.CreateUserProfile(ctx, userCreation)
 	if err != nil {
 		// TODO: handle error

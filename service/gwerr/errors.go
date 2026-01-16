@@ -6,9 +6,11 @@ import (
 
 var (
 	// --- Authentication & Authorization (401, 403) ---
-	ErrUnauthorized  = errors.New("unauthorized: missing or invalid token")
-	ErrForbidden     = errors.New("forbidden: you don't have permission to access this resource")
-	ErrInvalidAPIKey = errors.New("invalid api key")
+	ErrUnauthorized          = errors.New("unauthorized: missing or invalid token")
+	ErrForbidden             = errors.New("forbidden: you don't have permission to access this resource")
+	ErrInvalidAPIKey         = errors.New("invalid api key")
+	ErrInvalidInput          = errors.New("invalid api input")
+	ErrInvalidAuthentication = errors.New("invalid authentication key")
 
 	// --- Request Validation (400) ---
 	ErrBadRequest      = errors.New("bad request: invalid input format")
