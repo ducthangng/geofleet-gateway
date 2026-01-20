@@ -7,6 +7,7 @@ import (
 	common_v1 "github.com/ducthangng/geofleet-proto/gen/go/common/v1"
 	identity_v1 "github.com/ducthangng/geofleet-proto/gen/go/identity/v1"
 
+	"github.com/ducthangng/geofleet/gateway/app/role"
 	"github.com/ducthangng/geofleet/gateway/app/singleton"
 	"github.com/ducthangng/geofleet/gateway/service/gwerr"
 	"github.com/ducthangng/geofleet/gateway/service/gwjwt"
@@ -89,7 +90,7 @@ func (u *IdentityService) Login(ctx context.Context, data LoginRequest) (LoginRe
 		grpcRes *identity_v1.LoginResponse
 	)
 
-	if len(data.Password) == 0 || len(data.Phone) == 0 {
+	if len(data.Password.Value) == 0 || len(data.Phone) == 0 {
 		return res, gwerr.ErrInvalidInput
 	}
 
@@ -97,30 +98,32 @@ func (u *IdentityService) Login(ctx context.Context, data LoginRequest) (LoginRe
 	grpcRes, err = u.UserClient.Login(ctx, &identity_v1.LoginRequest{
 		Phone: data.Phone,
 		Password: &common_v1.Password{
-			Value: data.Password,
+			Value: data.Password.Value,
 		},
 	})
 
 	if err != nil {
+		log.Println("error grpc record: ", err)
 		return res, err
 	}
 
-	if len(grpcRes.UserId) == 0 { // authenticated
+	if len(grpcRes.User.UserId) == 0 { // authenticated
 		return res, gwerr.ErrInvalidAPIKey
 	}
 
 	res.User = User{
-		UserId:   grpcRes.UserId,
+		UserId:   grpcRes.User.UserId,
 		Fullname: grpcRes.User.Fullname,
 		Email:    grpcRes.User.Email,
 		Phone:    grpcRes.User.Phone,
 		Address:  grpcRes.User.Address,
+		Role:     role.Role(grpcRes.User.Role),
 	}
 
 	res.JWTToken, err = gwjwt.EncodeJWT(gwjwt.JWTEncodingType{
 		UserId: res.User.UserId,
 		Phone:  res.User.Phone,
-		Role:   res.User.Role.String(),
+		Role:   role.Role(grpcRes.User.Role).String(),
 	})
 
 	if err != nil {

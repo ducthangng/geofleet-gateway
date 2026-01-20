@@ -31,8 +31,12 @@ type CheckDuplicatePhoneResponse struct {
 
 // copy from protobuf
 type LoginRequest struct {
-	Phone    string `json:"phone"`
-	Password string `json:"password"`
+	Phone    string   `json:"phone"`
+	Password Password `json:"password"`
+}
+
+type Password struct {
+	Value string `json:"value"`
 }
 
 // copy from protobuf

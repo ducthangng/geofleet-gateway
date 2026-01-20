@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net"
 	"os"
 	"os/signal"
@@ -17,6 +18,7 @@ import (
 	identity_v1 "github.com/ducthangng/geofleet-proto/gen/go/identity/v1"
 	ride_v1 "github.com/ducthangng/geofleet-proto/gen/go/ride/v1"
 	tracking_v1 "github.com/ducthangng/geofleet-proto/gen/go/tracking/v1"
+	"github.com/lmittmann/tint"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
@@ -35,9 +37,16 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	// Beautiful, colored console output
+	logger := slog.New(tint.NewHandler(os.Stdout, &tint.Options{
+		Level:      slog.LevelDebug,
+		TimeFormat: "15:04:05", // Just show the time, not the full date
+	}))
+
 	// 2. Khởi tạo gRPC Server
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
+			middleware.NewSlogInterceptor(logger),
 			middleware.AuthUnaryInterceptor(),
 			// Bạn có thể thêm LoggingInterceptor hoặc RecoveryInterceptor ở đây
 		),

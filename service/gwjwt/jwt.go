@@ -23,6 +23,8 @@ type SigningClaims struct {
 func EncodeJWT(data JWTEncodingType) (string, error) {
 	jwtSecretKey := singleton.GlobalConfig.JwtSecretKey
 
+	convertedJWTKey := []byte(jwtSecretKey)
+
 	// encode jwt
 	newClaims := SigningClaims{
 		data,
@@ -34,7 +36,7 @@ func EncodeJWT(data JWTEncodingType) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims)
-	tokenString, err := token.SignedString(jwtSecretKey)
+	tokenString, err := token.SignedString(convertedJWTKey)
 	if err != nil {
 		return "", err
 	}

@@ -86,7 +86,16 @@ func (idh *IdentityHandler) Login(ctx context.Context, input *identity_v1.LoginR
 	}
 
 	res = &identity_v1.LoginResponse{
-		UserId: loginResponse.User.UserId,
+		UserId:      loginResponse.User.UserId,
+		AccessToken: loginResponse.JWTToken,
+		User: &identity_v1.GetUserProfileResponse{
+			UserId:   loginResponse.User.UserId,
+			Fullname: loginResponse.User.Fullname,
+			Phone:    loginResponse.User.Phone,
+			Email:    loginResponse.User.Email,
+			Address:  loginResponse.User.Address,
+			Role:     identity_v1.UserRole(loginResponse.User.Role),
+		},
 	}
 
 	return res, nil

@@ -22,7 +22,7 @@ func NewTrackingHandler() *TrackingHandler {
 }
 
 type DriverLocationEvent struct {
-	DriverID  string  `json:"driver_id"`
+	UserID    string  `json:"user_id"`
 	Lat       float64 `json:"lat"`
 	Lng       float64 `json:"lng"`
 	Timestamp int64   `json:"timestamp"`
@@ -62,7 +62,7 @@ func (thl *TrackingHandler) UploadLocationHistory(stream tracking_v1.TrackingSer
 		geoKey := hash[:5] // Lấy 5 ký tự đầu để nhóm các xe trong cùng 1 khu vực vào 1 Partition
 
 		event := DriverLocationEvent{
-			DriverID:  req.DriverId,
+			UserID:    req.DriverId,
 			Lat:       req.Location.Lat,
 			Lng:       req.Location.Lng,
 			Timestamp: time.Now().Unix(),

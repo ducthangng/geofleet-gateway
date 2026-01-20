@@ -9,7 +9,9 @@ require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/hashicorp/consul/api v1.33.0
+	github.com/lmittmann/tint v1.1.2
 	github.com/mbobakov/grpc-consul-resolver v1.5.3
 	github.com/mmcloughlin/geohash v0.10.0
 	github.com/segmentio/kafka-go v0.4.49
