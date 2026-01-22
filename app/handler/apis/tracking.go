@@ -78,7 +78,7 @@ func (thl *TrackingHandler) UploadLocationHistory(stream tracking_v1.TrackingSer
 
 		log.Println("writing message ...")
 		err = kafkaWriter.WriteMessages(ctx, kafka.Message{
-			Topic: "telemetry.driver.locations",
+			Topic: "ride_tracking.raw_coordinate",
 			Key:   []byte(geoKey), //  DriverID is the key
 			Value: payload,
 		})
@@ -88,6 +88,8 @@ func (thl *TrackingHandler) UploadLocationHistory(stream tracking_v1.TrackingSer
 			// Optional: can continue depend on the type of data
 			// here, the data is a stream of locaiton, which mean it does not matter if one didnt receive
 			continue
+		} else {
+			log.Println("Message sent successfully to Kafka!") // Xem log này có hiện ra không
 		}
 
 		log.Println("increased count")

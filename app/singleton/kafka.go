@@ -20,12 +20,14 @@ func GetKafkaWriter() *kafka.Writer {
 		brokers := centralConfig.KafkaBrokers
 
 		kafkaWriter = &kafka.Writer{
-			Addr:         kafka.TCP(brokers...),
-			Balancer:     &kafka.LeastBytes{}, // Efficiently distributes messages
-			BatchTimeout: 10 * time.Millisecond,
-			Async:        true, // Non-blocking for Gateway performance
-			Logger:       kafka.LoggerFunc(log.Printf),
-			ErrorLogger:  kafka.LoggerFunc(log.Printf),
+			Addr:                   kafka.TCP(brokers...),
+			Balancer:               &kafka.LeastBytes{}, // Efficiently distributes messages
+			BatchTimeout:           10 * time.Millisecond,
+			Async:                  false, // Non-blocking for Gateway performance
+			MaxAttempts:            3,
+			Logger:                 kafka.LoggerFunc(log.Printf),
+			ErrorLogger:            kafka.LoggerFunc(log.Printf),
+			AllowAutoTopicCreation: true, //
 		}
 	})
 

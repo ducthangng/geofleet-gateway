@@ -24,12 +24,13 @@ import (
 )
 
 func main() {
+	// ctx := context.Background()
 	singleton.InitializeConfig()
 	centralConfig := singleton.GetGlobalConfig()
 
+	singleton.GetKafkaWriter()
 	singleton.GetRedisClient()
 	singleton.GetConsulClient()
-	singleton.GetKafkaWriter()
 
 	// 1. Mở port TCP
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", centralConfig.Host, centralConfig.Port))
@@ -87,6 +88,13 @@ func main() {
 	healthServer.SetServingStatus("user-service", healthpb.HealthCheckResponse_SERVING)
 
 	reflection.Register(server)
+
+	// go func() {
+	// 	for {
+	// 		redisPong := redis.Ping(ctx).String()
+	// 		consulPong := consulClient.
+	// 	}
+	// }()
 
 	// 5. Start server
 	if err := server.Serve(lis); err != nil {
