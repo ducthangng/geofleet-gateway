@@ -56,13 +56,13 @@ func main() {
 		),
 	)
 
-	userHandler := apis.NewIdentityHandler()
 	rideHandler := apis.NewRideHandler()
+	userHandler := apis.NewIdentityHandler()
 	trackingHandler := apis.NewTrackingHandler()
 
 	// register the services
-	identity_v1.RegisterUserServiceServer(server, userHandler)
 	ride_v1.RegisterRideServiceServer(server, rideHandler)
+	identity_v1.RegisterUserServiceServer(server, userHandler)
 	tracking_v1.RegisterTrackingServiceServer(server, trackingHandler)
 
 	// 4. Xử lý Graceful Shutdown (Hủy đăng ký khi tắt app)
