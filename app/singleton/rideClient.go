@@ -20,7 +20,7 @@ func NewRideClient() ride_v1.RideServiceClient {
 
 	rideClientOnce.Do(func() {
 
-		target := "consul://127.0.0.1/ride_service?wait=14s"
+		target := "consul://127.0.0.1:8500/ride-service?wait=14s"
 
 		rideConn, err = grpc.NewClient(
 			target,
@@ -31,6 +31,7 @@ func NewRideClient() ride_v1.RideServiceClient {
 
 		if err != nil {
 			log.Println("failed to connect to consul client: Ride Client")
+			return
 		}
 
 		rideClient = ride_v1.NewRideServiceClient(rideConn)

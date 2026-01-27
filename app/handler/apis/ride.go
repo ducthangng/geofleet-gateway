@@ -1,11 +1,10 @@
 package apis
 
 import (
-	"io"
+	"context"
 
 	ride_v1 "github.com/ducthangng/geofleet-proto/gen/go/ride/v1"
 	"github.com/ducthangng/geofleet/gateway/app/singleton"
-	"google.golang.org/grpc"
 )
 
 type RideHandler struct {
@@ -24,28 +23,13 @@ func (rhl *RideHandler) TrackMultipleRides(input *ride_v1.TrackMultipleRidesRequ
 }
 
 // Risk: Bottleneck when there are a lot of ride request
-func (rhl *RideHandler) RequestRide(input *ride_v1.RequestRideRequest, stream grpc.ServerStreamingServer[ride_v1.RequestRideResponse]) error {
-	ctx := stream.Context()
-
-	rideStream, err := rhl.RideClient.RequestRide(ctx, &ride_v1.RequestRideRequest{})
+func (rhl *RideHandler) RequestRide(ctx context.Context, input *ride_v1.RequestRideRequest) (*ride_v1.RequestRideResponse, error) {
+	result, err := rhl.RideClient.RequestRide(ctx, input)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	for {
-		// call ride service
-		resp, err := rideStream.Recv()
-		if err == io.EOF {
-			// end of file, return nil
-			return nil
-		}
-
-		if err != nil {
-			return err
-		}
-
-		stream.Send(resp)
-	}
+	return result, nil
 }
 
 func (rhl *RideHandler) AcceptRide() {

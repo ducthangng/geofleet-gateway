@@ -47,13 +47,15 @@ func EncodeJWT(data JWTEncodingType) (string, error) {
 func VerifyToken(tokenString string) (*SigningClaims, error) {
 	jwtSecretKey := singleton.GlobalConfig.JwtSecretKey
 
+	convertedJWTKey := []byte(jwtSecretKey)
+
 	// Parse the token
 	token, err := jwt.ParseWithClaims(tokenString, &SigningClaims{}, func(t *jwt.Token) (interface{}, error) {
 		// Check that the signing method is HMAC
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
-		return jwtSecretKey, nil
+		return convertedJWTKey, nil
 	})
 
 	if err != nil {

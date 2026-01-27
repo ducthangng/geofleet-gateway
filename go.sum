@@ -40,8 +40,8 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
-github.com/ducthangng/geofleet-proto v0.0.0-20260124063825-457a51ee0538 h1:mierm2EVt6QZT3yE1MVo1bP3YqNgD6X3Yn13lcu65Ds=
-github.com/ducthangng/geofleet-proto v0.0.0-20260124063825-457a51ee0538/go.mod h1:2zERKzZECJraxnPwFzlI662W7Y2wHYcvElZHjnLhdYY=
+github.com/ducthangng/geofleet-proto v0.0.0-20260127031556-bc7f0dd5c426 h1:Y3hdrLYbtWK55IjzTLeGFOToTpe0uNdYAE3EdrgckxI=
+github.com/ducthangng/geofleet-proto v0.0.0-20260127031556-bc7f0dd5c426/go.mod h1:2zERKzZECJraxnPwFzlI662W7Y2wHYcvElZHjnLhdYY=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.9.0/go.mod h1:eQcE1qtQxscV5RaZvpXrrb8Drkc3/DdQ+uUYCNjL+zU=
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
