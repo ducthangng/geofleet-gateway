@@ -5,10 +5,11 @@ go 1.25.4
 require (
 	buf.build/go/protovalidate v1.1.0
 	github.com/bytedance/sonic v1.14.0
-	github.com/ducthangng/geofleet-proto v0.0.0-20260127031556-bc7f0dd5c426
+	github.com/ducthangng/geofleet-proto v0.0.0-20260203041241-9c692e026ccb
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/hashicorp/consul/api v1.33.0
 	github.com/lmittmann/tint v1.1.2
