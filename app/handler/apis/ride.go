@@ -3,8 +3,6 @@ package apis
 import (
 	"context"
 	"errors"
-	"io"
-	"log"
 
 	ride_v1 "github.com/ducthangng/geofleet-proto/gen/go/ride/v1"
 	"github.com/ducthangng/geofleet/gateway/app/singleton"
@@ -33,33 +31,24 @@ func (rhl *RideHandler) RequestRide(ctx context.Context, input *ride_v1.RequestR
 	return result, nil
 }
 
-func (rhl *RideHandler) SubscribeRideUpdate(input *ride_v1.SubscribeRideUpdateRequest, stream grpc.ServerStreamingServer[ride_v1.SubscribeRideUpdateResponse]) error {
-
-	// a stream from the user --> gateway --> rideservice
-	ctx := stream.Context()
-
-	rideServiceStream, err := rhl.RideClient.SubscribeRideUpdate(ctx, input)
+func (rhl *RideHandler) TriggerRideUpdate(ctx context.Context, input *ride_v1.TriggerRideUpdateRequest) (*ride_v1.TriggerRideUpdateResponse, error) {
+	response, err := rhl.RideClient.TriggerRideUpdate(ctx, input)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	for {
-		msg, err := rideServiceStream.Recv()
-		if err == io.EOF {
-			return nil
-		}
+	// trigger the kafka listening
 
-		if err != nil {
-			log.Println("rideServiceStream_e1: ", err)
-			return err
-		}
+	return response, nil
+}
 
-		// when receive the message, send back immediately to the user
-		if err = stream.SendMsg(msg); err != nil {
-			log.Println("rideServiceStream_e2: ", err)
-			return err
-		}
-	}
+func (rhl *RideHandler) SubscribeRideUpdate(input *ride_v1.SubscribeRideUpdateRequest, stream grpc.ServerStreamingServer[ride_v1.SubscribeRideUpdateResponse]) error {
+	// ctx := stream.Context()
+
+	// subscribe success, then hold this request
+
+	return nil
+
 }
 
 func (rhl *RideHandler) TrackMultipleRides(input *ride_v1.TrackMultipleRidesRequest, stream ride_v1.RideService_TrackMultipleRidesServer) (err error) {
