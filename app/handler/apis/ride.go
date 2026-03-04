@@ -3,21 +3,27 @@ package apis
 import (
 	"context"
 	"errors"
+	"log"
+	"time"
 
 	ride_v1 "github.com/ducthangng/geofleet-proto/gen/go/ride/v1"
+	"github.com/ducthangng/geofleet/gateway/app/infrastructure/ride_manager"
 	"github.com/ducthangng/geofleet/gateway/app/singleton"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type RideHandler struct {
 	ride_v1.UnimplementedRideServiceServer
-	RideClient ride_v1.RideServiceClient
+	RideClient  ride_v1.RideServiceClient
+	RideManager *ride_manager.RideManager
 }
 
 func NewRideHandler() *RideHandler {
 	return &RideHandler{
-		RideClient: singleton.NewRideClient(),
+		RideClient:  singleton.NewRideClient(),
+		RideManager: ride_manager.Initialize(),
 	}
 }
 
@@ -31,24 +37,53 @@ func (rhl *RideHandler) RequestRide(ctx context.Context, input *ride_v1.RequestR
 	return result, nil
 }
 
+// this can be called directly inside request ride
 func (rhl *RideHandler) TriggerRideUpdate(ctx context.Context, input *ride_v1.TriggerRideUpdateRequest) (*ride_v1.TriggerRideUpdateResponse, error) {
 	response, err := rhl.RideClient.TriggerRideUpdate(ctx, input)
 	if err != nil {
 		return nil, err
 	}
 
-	// trigger the kafka listening
-
 	return response, nil
 }
 
+// SubscribeRideUpdate: the client will receive the stream of response from the service via this method.
 func (rhl *RideHandler) SubscribeRideUpdate(input *ride_v1.SubscribeRideUpdateRequest, stream grpc.ServerStreamingServer[ride_v1.SubscribeRideUpdateResponse]) error {
-	// ctx := stream.Context()
+	ctx := stream.Context()
 
-	// subscribe success, then hold this request
+	// subscribe to updates
+	sessionID, ch := rhl.RideManager.Subscribe(ctx, input.RideId)
+	if len(sessionID) != 36 {
+		log.Println("error occur at subscribing: ", sessionID)
+	}
 
-	return nil
+	previousUpdate := []*ride_v1.RideStatusUpdateResponse{}
 
+	for {
+		select {
+		case <-ctx.Done():
+			// Unsubscribe the data
+			rhl.RideManager.Unsubscribe(input.RideId, sessionID)
+
+		case data := <-ch:
+			if err := stream.Send(&ride_v1.SubscribeRideUpdateResponse{
+				RideId: input.RideId,
+				RideStatus: &ride_v1.RideStatusUpdateResponse{
+					RideStatus:  ride_v1.RideStatus(data.RideStatus),
+					LastUpdated: timestamppb.New(time.Now()),
+				},
+				PreviousRideStatus: previousUpdate,
+				LastUpdated:        timestamppb.New(time.Now()),
+			}); err != nil {
+				return err
+			}
+
+			previousUpdate = append(previousUpdate, &ride_v1.RideStatusUpdateResponse{
+				RideStatus:  ride_v1.RideStatus(data.RideStatus),
+				LastUpdated: timestamppb.New(time.Now()),
+			})
+		}
+	}
 }
 
 func (rhl *RideHandler) TrackMultipleRides(input *ride_v1.TrackMultipleRidesRequest, stream ride_v1.RideService_TrackMultipleRidesServer) (err error) {

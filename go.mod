@@ -5,7 +5,7 @@ go 1.25.4
 require (
 	buf.build/go/protovalidate v1.1.0
 	github.com/bytedance/sonic v1.14.0
-	github.com/ducthangng/geofleet-proto v0.0.0-20260207072417-123238b3fd71
+	github.com/ducthangng/geofleet-proto v0.0.0-20260304082029-204a8e4d6aaf
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v5 v5.3.0

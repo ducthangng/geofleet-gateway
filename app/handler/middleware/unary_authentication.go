@@ -35,12 +35,14 @@ func AuthUnaryInterceptor() grpc.UnaryServerInterceptor {
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
 
+		log.Println("checking in full methods ...")
 		if publicMethods[info.FullMethod] {
 			// bypassing unary interceptor
 			return handler(ctx, req)
 		}
 
 		// Checking authorization credentials
+		log.Println("checking authorize...")
 		userId, err := authorize(ctx)
 		if err != nil {
 			return nil, status.Errorf(codes.Unauthenticated, "invalid token: %v", err)
@@ -56,6 +58,7 @@ func AuthUnaryInterceptor() grpc.UnaryServerInterceptor {
 
 func authorize(ctx context.Context) (userId string, err error) {
 	// 1. Get metadata from context
+	log.Println("checking metadata...")
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return userId, status.Errorf(codes.Unauthenticated, "metadata is not provided")
@@ -68,6 +71,7 @@ func authorize(ctx context.Context) (userId string, err error) {
 	}
 
 	// 3. "Bearer <token>"
+	log.Println("bearer...")
 	authHeader := values[0]
 	if !strings.HasPrefix(authHeader, "Bearer ") {
 		return userId, status.Errorf(codes.Unauthenticated, "invalid auth header format")
@@ -75,6 +79,7 @@ func authorize(ctx context.Context) (userId string, err error) {
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 	// 4. Validate JWT
+	log.Println("checking claims...")
 	claims, err := gwjwt.VerifyToken(tokenString)
 	if err != nil {
 		return userId, status.Errorf(codes.Unauthenticated, "invalid token: %v", err)

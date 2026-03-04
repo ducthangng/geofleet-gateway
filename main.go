@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"log/slog"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/ducthangng/geofleet/gateway/app/handler/apis"
 	"github.com/ducthangng/geofleet/gateway/app/handler/middleware"
+	"github.com/ducthangng/geofleet/gateway/app/infrastructure/ride_manager"
 	"github.com/ducthangng/geofleet/gateway/app/singleton"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -24,7 +26,7 @@ import (
 )
 
 func main() {
-	// ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 	singleton.InitializeConfig()
 	centralConfig := singleton.GetGlobalConfig()
 
@@ -65,16 +67,25 @@ func main() {
 	identity_v1.RegisterUserServiceServer(server, userHandler)
 	tracking_v1.RegisterTrackingServiceServer(server, trackingHandler)
 
+	rideManager := ride_manager.Initialize()
+
+	go func() {
+		if err = rideManager.UpdateRideStatus(ctx); err != nil {
+			return
+		}
+	}()
+
 	// 4. Xử lý Graceful Shutdown (Hủy đăng ký khi tắt app)
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 		<-c
 		log.Println("Đang tắt Service...")
+
+		cancel()
 		// Hủy đăng ký trên Consul để Gateway không gọi vào nữa
 		// (Thực hiện gọi client.Agent().ServiceDeregister(serviceID))
 		server.GracefulStop()
-		os.Exit(0)
 	}()
 
 	// 1. Khởi tạo Health Server
@@ -88,13 +99,6 @@ func main() {
 	healthServer.SetServingStatus("user-service", healthpb.HealthCheckResponse_SERVING)
 
 	reflection.Register(server)
-
-	// go func() {
-	// 	for {
-	// 		redisPong := redis.Ping(ctx).String()
-	// 		consulPong := consulClient.
-	// 	}
-	// }()
 
 	// 5. Start server
 	if err := server.Serve(lis); err != nil {
