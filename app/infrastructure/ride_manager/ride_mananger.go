@@ -17,7 +17,6 @@ It operates as a doubled-linked-list that can be evicted if the ride's is either
   - End (finish, cancelled)
   - Are not update recently (in the nearest 10.000 rides)
 */
-
 type RideManager struct {
 	kafka *kakfa_consumer.KafkaManager
 	redis *redis_consumer.RedisConsumer
